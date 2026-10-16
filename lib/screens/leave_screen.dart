@@ -56,10 +56,16 @@ class LeaveScreen extends StatelessWidget {
         ),
         const SizedBox(height: 22),
         FilledButton.icon(
-          onPressed: () => showDialog<void>(
-            context: context,
-            builder: (_) => const _LeaveRequestDialog(),
-          ),
+          onPressed: () {
+            final hrProvider = context.read<HrProvider>();
+            showDialog<void>(
+              context: context,
+              builder: (_) => ChangeNotifierProvider.value(
+                value: hrProvider,
+                child: const _LeaveRequestDialog(),
+              ),
+            );
+          },
           icon: const Icon(Icons.add_rounded),
           label: const Text('Request time off'),
           style: FilledButton.styleFrom(
@@ -192,7 +198,8 @@ class _LeaveRequestDialogState extends State<_LeaveRequestDialog> {
   @override
   void initState() {
     super.initState();
-    _startDate = DateUtils.dateOnly(DateTime.now()).add(const Duration(days: 1));
+    _startDate =
+        DateUtils.dateOnly(DateTime.now()).add(const Duration(days: 1));
     _endDate = _startDate;
   }
 
@@ -245,9 +252,8 @@ class _LeaveRequestDialogState extends State<_LeaveRequestDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: hr.isSubmittingLeave
-              ? null
-              : () => Navigator.of(context).pop(),
+          onPressed:
+              hr.isSubmittingLeave ? null : () => Navigator.of(context).pop(),
           child: const Text('Cancel'),
         ),
         FilledButton(

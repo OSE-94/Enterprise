@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/hr_models.dart';
+import '../models/employee_account.dart';
 import '../providers/hr_provider.dart';
 import '../widgets/hr_widgets.dart';
 
@@ -14,6 +15,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hr = context.watch<HrProvider>();
+    final account = context.watch<EmployeeAccount>();
     final employee = hr.employee;
 
     if (hr.isLoading && employee == null) {
@@ -47,7 +49,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              InitialsAvatar(initials: employee?.avatarInitials ?? 'AM'),
+              InitialsAvatar(initials: _initials(account.displayName)),
             ],
           ),
           const SizedBox(height: 28),
@@ -59,7 +61,7 @@ class HomeScreen extends StatelessWidget {
           ),
           const SizedBox(height: 3),
           Text(
-            employee?.name.split(' ').first ?? 'there',
+            account.displayName.split(' ').first,
             style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.8,
@@ -76,7 +78,7 @@ class HomeScreen extends StatelessWidget {
                 child: _QuickAction(
                   icon: Icons.beach_access_rounded,
                   label: 'Request time off',
-                  onTap: () => onNavigate(1),
+                  onTap: () => onNavigate(2),
                 ),
               ),
               const SizedBox(width: 12),
@@ -84,7 +86,7 @@ class HomeScreen extends StatelessWidget {
                 child: _QuickAction(
                   icon: Icons.person_search_rounded,
                   label: 'View my profile',
-                  onTap: () => onNavigate(3),
+                  onTap: () => onNavigate(4),
                 ),
               ),
             ],
@@ -93,7 +95,7 @@ class HomeScreen extends StatelessWidget {
           SectionHeading(
             'Upcoming time off',
             action: TextButton(
-              onPressed: () => onNavigate(1),
+              onPressed: () => onNavigate(2),
               child: const Text('See all'),
             ),
           ),
@@ -155,7 +157,7 @@ class HomeScreen extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () => onNavigate(2),
+                onTap: () => onNavigate(3),
               ),
             ),
         ],
@@ -170,6 +172,13 @@ class HomeScreen extends StatelessWidget {
     return 'evening';
   }
 
+  String _initials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty || parts.first.isEmpty) return '?';
+    return parts.length == 1
+        ? parts.first.substring(0, 1).toUpperCase()
+        : '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+  }
 }
 
 class _LeaveBalanceCard extends StatelessWidget {

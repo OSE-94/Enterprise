@@ -7,11 +7,15 @@ environment:
   sdk: ">=3.3.0 <4.0.0"
 
 dependencies:
+  firebase_auth: ^7.0.0
+  firebase_core: ^5.0.0
   flutter:
     sdk: flutter
   cupertino_icons: ^2.0.0
-  provider: ^6.1.2
+  geolocator: ^14.1.1
   intl: ^0.20.3
+  provider: ^6.1.2
+  supabase_flutter: ^2.18.3
 
 dev_dependencies:
   flutter_test:

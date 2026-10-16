@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/hr_provider.dart';
+import '../models/employee_account.dart';
+import '../services/auth_service.dart';
 import '../widgets/hr_widgets.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -9,8 +10,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hr = context.watch<HrProvider>();
-    final employee = hr.employee;
+    final employee = context.watch<EmployeeAccount>();
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
@@ -26,12 +26,12 @@ class ProfileScreen extends StatelessWidget {
             child: Column(
               children: [
                 InitialsAvatar(
-                  initials: employee?.avatarInitials ?? 'AM',
+                  initials: _initials(employee.displayName),
                   radius: 38,
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  employee?.name ?? 'Loading profile',
+                  employee.displayName,
                   style: const TextStyle(
                     fontSize: 21,
                     fontWeight: FontWeight.w800,
@@ -39,7 +39,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  employee?.role ?? '',
+                  employee.isAdmin ? 'Administrator' : 'Employee',
                   style: const TextStyle(color: Color(0xFF64716B)),
                 ),
               ],
@@ -47,19 +47,6 @@ class ProfileScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        if (employee == null && hr.errorMessage != null)
-          Card(
-            color: Theme.of(context).colorScheme.errorContainer,
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Text(
-                hr.errorMessage!,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onErrorContainer,
-                ),
-              ),
-            ),
-          ),
         const Text(
           'Work details',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
@@ -71,35 +58,43 @@ class ProfileScreen extends StatelessWidget {
               _ProfileDetail(
                 icon: Icons.alternate_email_rounded,
                 label: 'Work email',
-                value: employee?.email ?? '-',
+                value: employee.email,
               ),
               const Divider(height: 1, indent: 56),
               _ProfileDetail(
                 icon: Icons.groups_2_outlined,
                 label: 'Department',
-                value: employee?.department ?? '-',
+                value: employee.isAdmin ? 'Administration' : 'Team member',
               ),
               const Divider(height: 1, indent: 56),
               _ProfileDetail(
                 icon: Icons.beach_access_outlined,
                 label: 'Time-off balance',
-                value: '${employee?.leaveBalance ?? 0} days',
+                value: 'Managed by your People team',
               ),
             ],
           ),
         ),
         const SizedBox(height: 16),
-        const Card(
+        Card(
           child: ListTile(
-            leading: Icon(Icons.help_outline_rounded),
-            title: Text('Need help?'),
-            subtitle: Text('Contact your People team for support.'),
-            trailing: Icon(Icons.chevron_right_rounded),
+            leading: const Icon(Icons.logout_rounded),
+            title: const Text('Sign out'),
+            subtitle: const Text('Sign out of this account on this device.'),
+            onTap: () => AuthService().signOut(),
           ),
         ),
       ],
     );
   }
+}
+
+String _initials(String name) {
+  final parts = name.trim().split(RegExp(r'\s+'));
+  if (parts.isEmpty || parts.first.isEmpty) return '?';
+  return parts.length == 1
+      ? parts.first.substring(0, 1).toUpperCase()
+      : '${parts.first[0]}${parts.last[0]}'.toUpperCase();
 }
 
 class _ProfileDetail extends StatelessWidget {
