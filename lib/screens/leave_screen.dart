@@ -166,6 +166,17 @@ class _LeaveRequestCard extends StatelessWidget {
                       fontSize: 13,
                     ),
                   ),
+                  if (request.adminNote != null &&
+                      request.adminNote!.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      'Admin note: ${request.adminNote}',
+                      style: const TextStyle(
+                        color: Color(0xFF64716B),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

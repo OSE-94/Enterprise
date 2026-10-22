@@ -13,15 +13,20 @@ import '../services/location_service.dart';
 import 'app_shell.dart';
 import 'login_screen.dart';
 
-class AuthGate extends StatelessWidget {
+class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final auth = AuthService();
+  State<AuthGate> createState() => _AuthGateState();
+}
 
+class _AuthGateState extends State<AuthGate> {
+  late final AuthService _auth = AuthService();
+
+  @override
+  Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-      stream: auth.authStateChanges,
+      stream: _auth.authStateChanges,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return _AuthError(
@@ -31,8 +36,16 @@ class AuthGate extends StatelessWidget {
           return const _LoadingScreen();
         }
         final user = snapshot.data;
-        if (user == null) return LoginScreen(auth: auth);
-        return _ProfileLoader(key: ValueKey(user.uid), auth: auth, user: user);
+        if (user == null) {
+          _auth.requestedLoginRole = null;
+          return LoginScreen(auth: _auth);
+        }
+        return _ProfileLoader(
+          key: ValueKey(user.uid),
+          auth: _auth,
+          user: user,
+          requestedRole: _auth.requestedLoginRole,
+        );
       },
     );
   }
@@ -42,11 +55,13 @@ class _ProfileLoader extends StatefulWidget {
   const _ProfileLoader({
     required this.auth,
     required this.user,
+    required this.requestedRole,
     super.key,
   });
 
   final AuthService auth;
   final User user;
+  final UserRole? requestedRole;
 
   @override
   State<_ProfileLoader> createState() => _ProfileLoaderState();
@@ -76,12 +91,25 @@ class _ProfileLoaderState extends State<_ProfileLoader> {
         }
         if (!snapshot.hasData) return const _LoadingScreen();
         final employee = snapshot.data!;
+        if (widget.requestedRole != null &&
+            widget.requestedRole != employee.role) {
+          final selectedRole =
+              widget.requestedRole == UserRole.admin ? 'admin' : 'employee';
+          final assignedRole =
+              employee.role == UserRole.admin ? 'admin' : 'employee';
+          return _AuthError(
+            message: 'You selected $selectedRole sign-in, but this account is '
+                'assigned the $assignedRole role. Contact your administrator '
+                'if you need your access changed.',
+          );
+        }
 
         return MultiProvider(
           providers: [
             Provider<EmployeeAccount>.value(value: employee),
             ChangeNotifierProvider(
-              create: (_) => HrProvider(HrService())..load(),
+              create: (_) =>
+                  HrProvider(employee, HrService(account: employee))..load(),
             ),
             ChangeNotifierProvider(
               create: (_) => AttendanceProvider(

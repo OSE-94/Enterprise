@@ -86,7 +86,7 @@ class HomeScreen extends StatelessWidget {
                 child: _QuickAction(
                   icon: Icons.person_search_rounded,
                   label: 'View my profile',
-                  onTap: () => onNavigate(4),
+                  onTap: () => onNavigate(6),
                 ),
               ),
             ],

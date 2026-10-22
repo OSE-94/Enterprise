@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:people_pulse/models/attendance_models.dart';
+import 'package:people_pulse/models/employee_operations_models.dart';
 import 'package:people_pulse/models/employee_account.dart';
+import 'package:people_pulse/models/hr_models.dart';
 
 void main() {
   group('ClockLocation', () {
@@ -69,6 +71,57 @@ void main() {
       );
 
       expect(account.isAdmin, isFalse);
+    });
+  });
+
+  group('LeaveRequest', () {
+    test('parses a persistent pending request returned by Supabase', () {
+      final request = LeaveRequest.fromMap({
+        'id': 'leave-1',
+        'employee_uid': 'employee-1',
+        'employee_name': 'Alex Morgan',
+        'employee_email': 'alex@example.com',
+        'leave_type': 'Annual leave',
+        'start_date': '2026-11-02',
+        'end_date': '2026-11-04',
+        'status': 'pending',
+        'admin_note': null,
+      });
+
+      expect(request.status, LeaveStatus.pending);
+      expect(request.days, 3);
+      expect(request.employeeUid, 'employee-1');
+    });
+  });
+
+  group('Employee operations models', () {
+    test('parses messages and computed attendance history', () {
+      final message = EmployeeMessage.fromMap({
+        'id': 'message-1',
+        'sender_uid': 'admin-1',
+        'sender_name': 'Team Admin',
+        'sender_email': 'admin@example.com',
+        'recipient_uid': null,
+        'recipient_name': null,
+        'subject': 'Update',
+        'body': 'Team meeting at 10.',
+        'is_broadcast': true,
+        'created_at': '2026-10-22T09:00:00Z',
+      });
+      final history = AttendanceHistoryEntry.fromMap({
+        'attendance_id': 'shift-1',
+        'employee_uid': 'employee-1',
+        'employee_name': 'Alex Morgan',
+        'employee_email': 'alex@example.com',
+        'status': 'clocked_out',
+        'clock_in_at': '2026-10-21T08:00:00Z',
+        'clock_out_at': '2026-10-21T16:30:00Z',
+        'total_work_seconds': 27000,
+      });
+
+      expect(message.isBroadcast, isTrue);
+      expect(history.workedSeconds, 27000);
+      expect(history.clockOutAt, isNotNull);
     });
   });
 }

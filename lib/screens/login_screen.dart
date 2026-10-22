@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../models/employee_account.dart';
 import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -17,16 +18,25 @@ class _LoginScreenState extends State<LoginScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _adminInviteController = TextEditingController();
   bool _isRegistering = false;
   bool _isSubmitting = false;
   bool _obscurePassword = true;
+  UserRole _selectedRole = UserRole.employee;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _errorMessage = widget.auth.takePendingLoginError();
+  }
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _adminInviteController.dispose();
     super.dispose();
   }
 
@@ -63,12 +73,52 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 6),
                       Text(
                         _isRegistering
-                            ? 'Create your employee account'
+                            ? 'Create your ${_selectedRole == UserRole.admin ? 'admin' : 'employee'} account'
                             : 'Sign in to your team workspace',
                         textAlign: TextAlign.center,
                         style: const TextStyle(color: Color(0xFF64716B)),
                       ),
                       const SizedBox(height: 24),
+                      Text(
+                        _isRegistering ? 'Create account as' : 'Sign in as',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 8),
+                      SegmentedButton<UserRole>(
+                        segments: const [
+                          ButtonSegment(
+                            value: UserRole.employee,
+                            label: Text('Employee'),
+                            icon: Icon(Icons.person_outline_rounded),
+                          ),
+                          ButtonSegment(
+                            value: UserRole.admin,
+                            label: Text('Admin'),
+                            icon: Icon(Icons.admin_panel_settings_outlined),
+                          ),
+                        ],
+                        selected: {_selectedRole},
+                        onSelectionChanged: (selection) {
+                          setState(() {
+                            _selectedRole = selection.first;
+                            _errorMessage = null;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _selectedRole == UserRole.admin
+                            ? 'Admin registration requires a one-time invite '
+                                'ID issued by your organization.'
+                            : 'Admin permissions are assigned by your '
+                                'organization.',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontSize: 12,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
                       if (_isRegistering) ...[
                         TextFormField(
                           controller: _nameController,
@@ -82,6 +132,33 @@ class _LoginScreenState extends State<LoginScreen> {
                               value == null || value.trim().isEmpty
                                   ? 'Enter your name'
                                   : null,
+                        ),
+                        const SizedBox(height: 14),
+                        if (_selectedRole == UserRole.admin) ...[
+                          TextFormField(
+                            controller: _adminInviteController,
+                            decoration: const InputDecoration(
+                              labelText: 'One-time admin invite ID',
+                              hintText: 'Paste the ID provided by your owner',
+                              border: OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.vpn_key_outlined),
+                            ),
+                            validator: _validateAdminInvite,
+                          ),
+                          const SizedBox(height: 14),
+                        ],
+                      ],
+                      if (!_isRegistering &&
+                          _selectedRole == UserRole.admin) ...[
+                        TextFormField(
+                          controller: _adminInviteController,
+                          decoration: const InputDecoration(
+                            labelText: 'Admin invite ID (optional)',
+                            hintText: 'Required only to redeem a new invite',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.vpn_key_outlined),
+                          ),
+                          validator: _validateAdminInvite,
                         ),
                         const SizedBox(height: 14),
                       ],
@@ -201,11 +278,19 @@ class _LoginScreenState extends State<LoginScreen> {
           name: _nameController.text,
           email: _emailController.text,
           password: _passwordController.text,
+          asRole: _selectedRole,
+          adminInviteId: _selectedRole == UserRole.admin
+              ? _adminInviteController.text
+              : null,
         );
       } else {
         await widget.auth.signIn(
           email: _emailController.text,
           password: _passwordController.text,
+          asRole: _selectedRole,
+          adminInviteId: _selectedRole == UserRole.admin
+              ? _adminInviteController.text
+              : null,
         );
       }
     } on FirebaseAuthException catch (error) {
@@ -266,4 +351,16 @@ class _LoginScreenState extends State<LoginScreen> {
         'network-request-failed' => 'Check your internet connection.',
         _ => 'Authentication failed ($code). Please try again.',
       };
+
+  String? _validateAdminInvite(String? value) {
+    if (_selectedRole != UserRole.admin) return null;
+    final inviteId = value?.trim() ?? '';
+    if (!_isRegistering && inviteId.isEmpty) return null;
+    if (!RegExp(
+      r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+    ).hasMatch(inviteId)) {
+      return 'Enter the valid invite ID from your organization';
+    }
+    return null;
+  }
 }

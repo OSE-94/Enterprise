@@ -31,6 +31,11 @@ The app uses Supabase project `qajmkpqxdptcvnookya` and Firebase project
    back in.
 3. In the Supabase SQL Editor, run the complete migration in
    `supabase/migrations/20261015190000_attendance.sql`.
+   Then run `supabase/migrations/20261022150000_admin_invites.sql` to enable
+   one-time admin invite registration.
+   Run `supabase/migrations/20261022170000_employee_operations.sql` to enable
+   persistent leave requests and approvals, team messaging, work history, and
+   hourly pay rates.
 4. In **Project Settings → API Keys**, copy the project's publishable key
    (`sb_publishable_...`). This client key is intended for Flutter apps; never
    use a `service_role` or secret key in the app.
@@ -61,11 +66,40 @@ Postgres; the app captures device coordinates only for those two events.
 Break start/end times are also recorded. No continuous location tracking or
 worksite geofence is used.
 
+At sign-in, users can choose Employee or Admin. The selected option is checked
+against the account's Supabase profile role; it does not grant permissions.
+Admin registration also requires an unused, owner-issued invite ID. After
+applying the admin-invites migration, a trusted project owner can generate one
+in the Supabase SQL Editor:
+
+```sql
+insert into public.admin_invites default values
+returning invite_id;
+```
+
+Give the returned UUID only to the intended administrator. It can be redeemed
+once; do not post it publicly. Firebase users must also have the
+`role: "authenticated"` custom claim before the app can call Supabase. New
+Firebase accounts need a trusted onboarding function to set that claim.
+Alternatively, after creating the Firebase account, a trusted owner can assign
+the claim with the Firebase Admin SDK; the user can then choose **Admin** at
+sign-in and enter the invite ID to redeem it. Existing administrators can sign
+in without an invite ID.
+
+After an account's profile role is set to `admin`, signing in loads the admin
+dashboard, with live team attendance summaries, a team attendance view, and
+the administrator's profile. Employee accounts continue to see the employee
+home, time clock, time-off, updates, and profile pages.
+
 If you previously registered before this setup, the Firebase account may
 already exist. Sign in with that account after configuring Supabase.
 
-Time-off requests, balances, and company updates are still sample data from
-`HrService`.
+Leave balances and company updates still use sample data from `HrService`.
+Leave requests and approval decisions are stored in Supabase. Admins can
+approve or decline requests, send one-to-one messages or team broadcasts, and
+review attendance history. Hourly pay estimates use each employee's configured
+GBP rate multiplied by recorded work time, excluding recorded breaks; these
+estimates are not payroll calculations.
 
 ## Run checks
 
