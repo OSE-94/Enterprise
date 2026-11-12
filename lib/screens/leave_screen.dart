@@ -21,9 +21,11 @@ class LeaveScreen extends StatelessWidget {
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 6),
-        const Text(
+        Text(
           'Plan a break or check on a request.',
-          style: TextStyle(color: Color(0xFF64716B)),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: 20),
         Card(
@@ -31,9 +33,9 @@ class LeaveScreen extends StatelessWidget {
             padding: const EdgeInsets.all(18),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.beach_access_rounded,
-                  color: Color(0xFF3B6F64),
+                  color: Theme.of(context).colorScheme.primary,
                   size: 26,
                 ),
                 const SizedBox(width: 14),
@@ -144,9 +146,12 @@ class _LeaveRequestCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            const CircleAvatar(
-              backgroundColor: Color(0xFFEAF2EE),
-              child: Icon(Icons.event_outlined, color: Color(0xFF3B6F64)),
+            CircleAvatar(
+              backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+              child: Icon(
+                Icons.event_outlined,
+                color: Theme.of(context).colorScheme.onSecondaryContainer,
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -161,8 +166,8 @@ class _LeaveRequestCard extends StatelessWidget {
                   Text(
                     '$dateLabel · ${request.days} '
                     '${request.days == 1 ? 'day' : 'days'}',
-                    style: const TextStyle(
-                      color: Color(0xFF64716B),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 13,
                     ),
                   ),
@@ -171,8 +176,8 @@ class _LeaveRequestCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       'Admin note: ${request.adminNote}',
-                      style: const TextStyle(
-                        color: Color(0xFF64716B),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 12,
                       ),
                     ),
@@ -343,13 +348,15 @@ class _DateField extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(color: Color(0xFF64716B)),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
           Text(
             DateFormat('d MMM yyyy').format(date),
-            style: const TextStyle(
-              color: Color(0xFF24312C),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
               fontWeight: FontWeight.w600,
             ),
           ),

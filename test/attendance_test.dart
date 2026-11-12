@@ -1,8 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:people_pulse/models/attendance_models.dart';
 import 'package:people_pulse/models/employee_operations_models.dart';
 import 'package:people_pulse/models/employee_account.dart';
 import 'package:people_pulse/models/hr_models.dart';
+import 'package:people_pulse/providers/theme_provider.dart';
 
 void main() {
   group('ClockLocation', () {
@@ -47,6 +49,41 @@ void main() {
       expect(record.clockInAt, clockIn);
       expect(record.clockInLocation.accuracy, 8.5);
       expect(record.clockOutAt, isNull);
+    });
+
+    test('calculates elapsed, break, and net worked time', () {
+      final clockIn = DateTime.utc(2026, 11, 12, 8);
+      final clockOut = DateTime.utc(2026, 11, 12, 16, 30);
+      final record = AttendanceRecord(
+        id: 'shift-1',
+        userId: 'employee-1',
+        employeeName: 'Alex Morgan',
+        employeeEmail: 'alex@example.com',
+        status: AttendanceStatus.clockedOut,
+        clockInAt: clockIn,
+        clockInLocation: const ClockLocation(
+          latitude: 51.5,
+          longitude: -0.12,
+          accuracy: 10,
+        ),
+        clockOutAt: clockOut,
+        clockOutLocation: const ClockLocation(
+          latitude: 51.51,
+          longitude: -0.13,
+          accuracy: 12,
+        ),
+      );
+      final breaks = [
+        BreakEntry(
+          id: 'break-1',
+          startedAt: DateTime.utc(2026, 11, 12, 12),
+          endedAt: DateTime.utc(2026, 11, 12, 12, 30),
+        ),
+      ];
+
+      expect(record.elapsedDuration(), const Duration(hours: 8, minutes: 30));
+      expect(record.totalBreakDuration(breaks), const Duration(minutes: 30));
+      expect(record.workedDuration(breaks), const Duration(hours: 8));
     });
   });
 
@@ -122,6 +159,23 @@ void main() {
       expect(message.isBroadcast, isTrue);
       expect(history.workedSeconds, 27000);
       expect(history.clockOutAt, isNotNull);
+    });
+  });
+
+  group('ThemeProvider', () {
+    test('persists dark mode between provider instances', () async {
+      SharedPreferences.setMockInitialValues({});
+      final preferences = await SharedPreferences.getInstance();
+      final provider = ThemeProvider(preferences);
+
+      expect(provider.isDarkMode, isFalse);
+      await provider.setDarkMode(true);
+      expect(provider.isDarkMode, isTrue);
+
+      final restoredProvider = ThemeProvider(preferences);
+      expect(restoredProvider.isDarkMode, isTrue);
+      provider.dispose();
+      restoredProvider.dispose();
     });
   });
 }

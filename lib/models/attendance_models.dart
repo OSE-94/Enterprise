@@ -62,6 +62,32 @@ class AttendanceRecord {
   final String? activeBreakId;
   final DateTime? activeBreakStartedAt;
 
+  Duration elapsedDuration({DateTime? now}) {
+    final start = clockInAt;
+    if (start == null) return Duration.zero;
+    final end = clockOutAt ?? now ?? DateTime.now();
+    final duration = end.difference(start);
+    return duration.isNegative ? Duration.zero : duration;
+  }
+
+  Duration totalBreakDuration(List<BreakEntry> breaks, {DateTime? now}) {
+    final currentTime = now ?? DateTime.now();
+    return breaks.fold<Duration>(Duration.zero, (total, entry) {
+      final start = entry.startedAt;
+      if (start == null) return total;
+      final end = entry.endedAt ?? currentTime;
+      final duration = end.difference(start);
+      return total + (duration.isNegative ? Duration.zero : duration);
+    });
+  }
+
+  Duration workedDuration(List<BreakEntry> breaks, {DateTime? now}) {
+    final currentTime = now ?? DateTime.now();
+    final worked = elapsedDuration(now: currentTime) -
+        totalBreakDuration(breaks, now: currentTime);
+    return worked.isNegative ? Duration.zero : worked;
+  }
+
   factory AttendanceRecord.fromMap(Map<String, dynamic> data) {
     return AttendanceRecord(
       id: data['id'] as String,

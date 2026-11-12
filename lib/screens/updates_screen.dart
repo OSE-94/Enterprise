@@ -19,9 +19,11 @@ class UpdatesScreen extends StatelessWidget {
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 6),
-        const Text(
+        Text(
           'News and notes from your team.',
-          style: TextStyle(color: Color(0xFF64716B)),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: 20),
         if (hr.errorMessage != null)
@@ -66,13 +68,17 @@ class UpdatesScreen extends StatelessWidget {
                             vertical: 5,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEAF2EE),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .secondaryContainer,
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
                             announcement.category,
-                            style: const TextStyle(
-                              color: Color(0xFF315B50),
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSecondaryContainer,
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
@@ -81,8 +87,9 @@ class UpdatesScreen extends StatelessWidget {
                         const Spacer(),
                         Text(
                           DateFormat('d MMM').format(announcement.publishedAt),
-                          style: const TextStyle(
-                            color: Color(0xFF64716B),
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                             fontSize: 12,
                           ),
                         ),
@@ -99,8 +106,8 @@ class UpdatesScreen extends StatelessWidget {
                     const SizedBox(height: 7),
                     Text(
                       announcement.body,
-                      style: const TextStyle(
-                        color: Color(0xFF64716B),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         height: 1.45,
                       ),
                     ),

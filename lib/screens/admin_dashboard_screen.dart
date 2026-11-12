@@ -47,9 +47,11 @@ class AdminDashboardScreen extends StatelessWidget {
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 6),
-        const Text(
+        Text(
           'A live overview of your team’s attendance.',
-          style: TextStyle(color: Color(0xFF64716B)),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: 20),
         if (attendance.errorMessage != null) ...[
@@ -186,7 +188,9 @@ class _DashboardMetric extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 label,
-                style: const TextStyle(color: Color(0xFF64716B)),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),

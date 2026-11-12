@@ -96,7 +96,8 @@ class _WorkHistoryScreenState extends State<WorkHistoryScreen> {
           account.isAdmin
               ? 'Recorded hours and estimated pay by employee.'
               : 'Your recorded shifts and total working time.',
-          style: const TextStyle(color: Color(0xFF64716B)),
+          style:
+              TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
         if (_error != null) ...[
           const SizedBox(height: 16),
@@ -210,7 +211,10 @@ class _TotalHoursCard extends StatelessWidget {
         padding: const EdgeInsets.all(18),
         child: Row(
           children: [
-            const Icon(Icons.schedule_rounded, color: Color(0xFF3B6F64)),
+            Icon(
+              Icons.schedule_rounded,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             const SizedBox(width: 12),
             const Expanded(
               child: Text(

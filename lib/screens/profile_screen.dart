@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/employee_account.dart';
+import '../providers/theme_provider.dart';
 import '../services/auth_service.dart';
 import '../widgets/hr_widgets.dart';
 
@@ -11,6 +12,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final employee = context.watch<EmployeeAccount>();
+    final themeProvider = context.watch<ThemeProvider>();
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
@@ -40,7 +42,9 @@ class ProfileScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   employee.isAdmin ? 'Administrator' : 'Employee',
-                  style: const TextStyle(color: Color(0xFF64716B)),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -77,6 +81,20 @@ class ProfileScreen extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Card(
+          child: SwitchListTile(
+            secondary: Icon(
+              themeProvider.isDarkMode
+                  ? Icons.dark_mode_rounded
+                  : Icons.light_mode_rounded,
+            ),
+            title: const Text('Dark mode'),
+            subtitle: const Text('Use a darker appearance across the app.'),
+            value: themeProvider.isDarkMode,
+            onChanged: (enabled) => _setDarkMode(context, enabled),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Card(
           child: ListTile(
             leading: const Icon(Icons.logout_rounded),
             title: const Text('Sign out'),
@@ -86,6 +104,17 @@ class ProfileScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Future<void> _setDarkMode(BuildContext context, bool enabled) async {
+    try {
+      await context.read<ThemeProvider>().setDarkMode(enabled);
+    } on Exception catch (error) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not save appearance setting: $error')),
+      );
+    }
   }
 }
 
@@ -111,15 +140,18 @@ class _ProfileDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: const Color(0xFF3B6F64)),
+      leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
       title: Text(
         label,
-        style: const TextStyle(color: Color(0xFF64716B), fontSize: 12),
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          fontSize: 12,
+        ),
       ),
       subtitle: Text(
         value,
-        style: const TextStyle(
-          color: Color(0xFF24312C),
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
           fontSize: 14,
           fontWeight: FontWeight.w600,
         ),

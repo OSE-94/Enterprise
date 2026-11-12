@@ -38,11 +38,11 @@ class HomeScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
                   'PeoplePulse',
                   style: TextStyle(
-                    color: Color(0xFF315B50),
+                    color: Theme.of(context).colorScheme.primary,
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.2,
@@ -56,7 +56,7 @@ class HomeScreen extends StatelessWidget {
           Text(
             'Good ${_greeting()},',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: const Color(0xFF64716B),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
           ),
           const SizedBox(height: 3),
@@ -109,11 +109,14 @@ class HomeScreen extends StatelessWidget {
             ...upcomingLeave.take(2).map(
                   (request) => Card(
                     child: ListTile(
-                      leading: const CircleAvatar(
-                        backgroundColor: Color(0xFFEAF2EE),
+                      leading: CircleAvatar(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.secondaryContainer,
                         child: Icon(
                           Icons.event_outlined,
-                          color: Color(0xFF3B6F64),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSecondaryContainer,
                         ),
                       ),
                       title: Text(request.type),
@@ -254,7 +257,7 @@ class _QuickAction extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, color: const Color(0xFF3B6F64)),
+              Icon(icon, color: Theme.of(context).colorScheme.primary),
               const SizedBox(height: 15),
               Text(
                 label,
@@ -281,7 +284,7 @@ class _EmptyCard extends StatelessWidget {
         padding: const EdgeInsets.all(18),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFF3B6F64)),
+            Icon(icon, color: Theme.of(context).colorScheme.primary),
             const SizedBox(width: 12),
             Expanded(child: Text(message)),
           ],

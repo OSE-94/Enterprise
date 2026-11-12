@@ -38,8 +38,8 @@ class InitialsAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     return CircleAvatar(
       radius: radius,
-      backgroundColor: const Color(0xFFE3EEE9),
-      foregroundColor: const Color(0xFF315B50),
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
       child: Text(
         initials,
         style: TextStyle(
@@ -59,16 +59,19 @@ class StatusPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final foregroundColor =
+        isDarkMode ? Color.lerp(color, Colors.white, 0.55)! : color;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withAlpha(26),
+        color: foregroundColor.withAlpha(isDarkMode ? 42 : 26),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         label,
         style: TextStyle(
-          color: color,
+          color: foregroundColor,
           fontSize: 12,
           fontWeight: FontWeight.w600,
         ),

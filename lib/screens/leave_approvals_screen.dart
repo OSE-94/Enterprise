@@ -32,9 +32,11 @@ class LeaveApprovalsScreen extends StatelessWidget {
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 6),
-        const Text(
+        Text(
           'Review and respond to employee leave requests.',
-          style: TextStyle(color: Color(0xFF64716B)),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: 18),
         Align(
@@ -125,7 +127,9 @@ class _ApprovalCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               request.employeeEmail,
-              style: const TextStyle(color: Color(0xFF64716B)),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
             const Divider(height: 22),
             Text(

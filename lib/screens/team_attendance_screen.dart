@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/attendance_models.dart';
 import '../providers/attendance_provider.dart';
+import '../widgets/attendance_shift_details.dart';
 import '../widgets/hr_widgets.dart';
 
 class TeamAttendanceScreen extends StatelessWidget {
@@ -20,9 +21,11 @@ class TeamAttendanceScreen extends StatelessWidget {
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 6),
-        const Text(
+        Text(
           'Clock events shared by employees in your workspace.',
-          style: TextStyle(color: Color(0xFF64716B)),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: 20),
         if (attendance.errorMessage != null)
@@ -77,7 +80,10 @@ class _SummaryCard extends StatelessWidget {
         padding: const EdgeInsets.all(18),
         child: Row(
           children: [
-            const Icon(Icons.groups_rounded, color: Color(0xFF3B6F64)),
+            Icon(
+              Icons.groups_rounded,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -132,17 +138,7 @@ class _TeamRecordCard extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                _TeamEvent(
-                  label: 'Clock in',
-                  date: record.clockInAt,
-                  location: record.clockInLocation,
-                ),
-                const SizedBox(height: 8),
-                _TeamEvent(
-                  label: 'Clock out',
-                  date: record.clockOutAt,
-                  location: record.clockOutLocation,
-                ),
+                AttendanceShiftDetails(record: record),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TextButton.icon(
@@ -168,53 +164,6 @@ class _TeamRecordCard extends StatelessWidget {
     return parts.length == 1
         ? parts.first.substring(0, 1).toUpperCase()
         : '${parts.first[0]}${parts.last[0]}'.toUpperCase();
-  }
-}
-
-class _TeamEvent extends StatelessWidget {
-  const _TeamEvent({
-    required this.label,
-    required this.date,
-    required this.location,
-  });
-
-  final String label;
-  final DateTime? date;
-  final ClockLocation? location;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const Icon(
-          Icons.location_on_outlined,
-          size: 18,
-          color: Color(0xFF3B6F64),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '$label: ${date == null ? '—' : _dateTime(date!)}',
-                style: const TextStyle(fontSize: 13),
-              ),
-              if (location != null)
-                Text(
-                  '${location!.latitude.toStringAsFixed(5)}, '
-                  '${location!.longitude.toStringAsFixed(5)} '
-                  '(±${location!.accuracy.round()} m)',
-                  style: const TextStyle(
-                    color: Color(0xFF64716B),
-                    fontSize: 12,
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ],
-    );
   }
 }
 

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../models/attendance_models.dart';
 import '../providers/attendance_provider.dart';
+import '../widgets/attendance_shift_details.dart';
 import '../widgets/hr_widgets.dart';
 
 class TimeClockScreen extends StatelessWidget {
@@ -23,9 +24,11 @@ class TimeClockScreen extends StatelessWidget {
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 6),
-        const Text(
+        Text(
           'Clock events include the date, time, and your device location.',
-          style: TextStyle(color: Color(0xFF64716B)),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: 20),
         _CurrentShiftCard(record: active),
@@ -93,10 +96,13 @@ class TimeClockScreen extends StatelessWidget {
           ),
           if (onBreak) ...[
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'End your break before clocking out.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Color(0xFF64716B), fontSize: 13),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontSize: 13,
+              ),
             ),
           ],
         ],
@@ -104,10 +110,13 @@ class TimeClockScreen extends StatelessWidget {
           const SizedBox(height: 14),
           const LinearProgressIndicator(),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'Getting your location and saving this event…',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Color(0xFF64716B), fontSize: 13),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontSize: 13,
+            ),
           ),
         ],
         const SizedBox(height: 28),
@@ -186,9 +195,12 @@ class _CurrentShiftCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Current status',
-                    style: TextStyle(color: Color(0xFF64716B), fontSize: 13),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 13,
+                    ),
                   ),
                   const SizedBox(height: 3),
                   Text(
@@ -201,16 +213,16 @@ class _CurrentShiftCard extends StatelessWidget {
                   if (record?.clockInAt != null)
                     Text(
                       'Started ${_formatTime(record!.clockInAt!)}',
-                      style: const TextStyle(
-                        color: Color(0xFF64716B),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 13,
                       ),
                     ),
                   if (record?.activeBreakStartedAt != null)
                     Text(
                       'Break started ${_formatTime(record!.activeBreakStartedAt!)}',
-                      style: const TextStyle(
-                        color: Color(0xFF64716B),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 13,
                       ),
                     ),
@@ -265,19 +277,7 @@ class _AttendanceCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            _EventLine(
-              icon: Icons.login_rounded,
-              title: 'Clock in',
-              date: record.clockInAt,
-              location: record.clockInLocation,
-            ),
-            const SizedBox(height: 8),
-            _EventLine(
-              icon: Icons.logout_rounded,
-              title: 'Clock out',
-              date: record.clockOutAt,
-              location: record.clockOutLocation,
-            ),
+            AttendanceShiftDetails(record: record),
             TextButton.icon(
               onPressed: () => showDialog<void>(
                 context: context,
@@ -289,54 +289,6 @@ class _AttendanceCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _EventLine extends StatelessWidget {
-  const _EventLine({
-    required this.icon,
-    required this.title,
-    required this.date,
-    required this.location,
-  });
-
-  final IconData icon;
-  final String title;
-  final DateTime? date;
-  final ClockLocation? location;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 18, color: const Color(0xFF3B6F64)),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                date == null
-                    ? '$title · not yet recorded'
-                    : '$title · ${_formatTime(date!)}',
-                style: const TextStyle(fontSize: 13),
-              ),
-              if (location != null)
-                Text(
-                  '${location!.latitude.toStringAsFixed(5)}, '
-                  '${location!.longitude.toStringAsFixed(5)} '
-                  '(±${location!.accuracy.round()} m)',
-                  style: const TextStyle(
-                    color: Color(0xFF64716B),
-                    fontSize: 12,
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

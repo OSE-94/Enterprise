@@ -106,7 +106,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
           account.isAdmin
               ? 'Send private messages or announcements to the team.'
               : 'Messages from your team and your private conversation with an admin.',
-          style: const TextStyle(color: Color(0xFF64716B)),
+          style:
+              TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
         const SizedBox(height: 16),
         FilledButton.icon(
@@ -217,8 +218,8 @@ class _MessageCard extends StatelessWidget {
                 Text(
                   DateFormat('d MMM, HH:mm')
                       .format(message.createdAt.toLocal()),
-                  style: const TextStyle(
-                    color: Color(0xFF64716B),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 12,
                   ),
                 ),
@@ -227,8 +228,8 @@ class _MessageCard extends StatelessWidget {
             const SizedBox(height: 3),
             Text(
               '$label · ${message.senderName}',
-              style: const TextStyle(
-                color: Color(0xFF64716B),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 12,
               ),
             ),

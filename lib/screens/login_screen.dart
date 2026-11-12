@@ -56,10 +56,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.groups_rounded,
                         size: 42,
-                        color: Color(0xFF315B50),
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                       const SizedBox(height: 12),
                       const Text(
@@ -76,7 +76,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? 'Create your ${_selectedRole == UserRole.admin ? 'admin' : 'employee'} account'
                             : 'Sign in to your team workspace',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: Color(0xFF64716B)),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
                       const SizedBox(height: 24),
                       Text(
