@@ -21,6 +21,41 @@ void main() {
         'accuracy': 8.5,
       });
     });
+
+    test('calculates the distance between captured GPS points', () {
+      const start = ClockLocation(
+        latitude: 51.5,
+        longitude: -0.12,
+        accuracy: 5,
+      );
+      const nearby = ClockLocation(
+        latitude: 51.501,
+        longitude: -0.12,
+        accuracy: 5,
+      );
+
+      expect(start.distanceTo(nearby), closeTo(111.2, 0.5));
+      expect(start.distanceTo(start), 0);
+    });
+
+    test('parses a successful clock-out distance result', () {
+      final result = ClockOutResult.fromMap({
+        'status': 'clocked_out',
+        'distance_meters': 212.6,
+      });
+
+      expect(result.distanceMeters, 212.6);
+    });
+
+    test('rejects approval-based clock-out responses', () {
+      expect(
+        () => ClockOutResult.fromMap({
+          'status': 'approval_required',
+          'distance_meters': 412.6,
+        }),
+        throwsFormatException,
+      );
+    });
   });
 
   group('AttendanceRecord', () {

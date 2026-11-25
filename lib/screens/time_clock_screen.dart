@@ -25,7 +25,8 @@ class TimeClockScreen extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          'Clock events include the date, time, and your device location.',
+          'Clock in from anywhere. Clock-out is allowed within 250 metres of '
+          'your clock-in location.',
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
@@ -150,8 +151,11 @@ class TimeClockScreen extends StatelessWidget {
     final succeeded = await action();
     if (!context.mounted) return;
     if (succeeded) {
+      final attendance = context.read<AttendanceProvider>();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(successMessage)),
+        SnackBar(
+          content: Text(attendance.successMessage ?? successMessage),
+        ),
       );
     }
   }

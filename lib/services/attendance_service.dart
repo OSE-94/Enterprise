@@ -11,7 +11,10 @@ abstract interface class AttendanceRepository {
 
   Future<void> clockIn(ClockLocation location);
 
-  Future<void> clockOut(AttendanceRecord record, ClockLocation location);
+  Future<ClockOutResult> clockOut(
+    AttendanceRecord record,
+    ClockLocation location,
+  );
 
   Future<void> startBreak(AttendanceRecord record);
 
@@ -66,17 +69,18 @@ class AttendanceService implements AttendanceRepository {
   }
 
   @override
-  Future<void> clockOut(
+  Future<ClockOutResult> clockOut(
     AttendanceRecord record,
     ClockLocation location,
   ) async {
-    await _client.rpc(
-      'clock_out',
+    final response = await _client.rpc(
+      'clock_out_with_location_check',
       params: {
         'p_attendance_id': record.id,
         'p_location': location.toMap(),
       },
     );
+    return ClockOutResult.fromMap(Map<String, dynamic>.from(response as Map));
   }
 
   @override

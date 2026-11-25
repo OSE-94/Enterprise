@@ -22,7 +22,8 @@ class TeamAttendanceScreen extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          'Clock events shared by employees in your workspace.',
+          'View employee clock-in and clock-out locations, open them on a map, '
+          'and review shift times.',
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),

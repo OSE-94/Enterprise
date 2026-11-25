@@ -28,6 +28,7 @@ class AttendanceProvider extends ChangeNotifier {
   bool isLoading = true;
   bool isWorking = false;
   String? errorMessage;
+  String? successMessage;
 
   AttendanceRecord? get activeRecord {
     for (final record in employeeRecords) {
@@ -54,7 +55,6 @@ class AttendanceProvider extends ChangeNotifier {
         notifyListeners();
       },
     );
-
     if (_employee.isAdmin) {
       _teamSubscription = _attendance.watchAllRecords().listen(
         (records) {
@@ -87,7 +87,9 @@ class AttendanceProvider extends ChangeNotifier {
 
     return _perform(() async {
       final location = await _location.currentLocation();
-      await _attendance.clockOut(record, location);
+      final result = await _attendance.clockOut(record, location);
+      successMessage = 'You are clocked out. Location difference: '
+          '${result.distanceMeters.round()} m.';
     });
   }
 
@@ -114,6 +116,7 @@ class AttendanceProvider extends ChangeNotifier {
   Future<bool> _perform(Future<void> Function() action) async {
     isWorking = true;
     errorMessage = null;
+    successMessage = null;
     notifyListeners();
     try {
       await action();

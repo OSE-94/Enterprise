@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 enum AttendanceStatus { clockedIn, onBreak, clockedOut }
 
 class AttendanceActionException implements Exception {
@@ -26,6 +28,21 @@ class ClockLocation {
         'accuracy': accuracy,
       };
 
+  double distanceTo(ClockLocation other) {
+    const earthRadiusMeters = 6371000.0;
+    final latitudeDelta = _radians(other.latitude - latitude);
+    final longitudeDelta = _radians(other.longitude - longitude);
+    final startLatitude = _radians(latitude);
+    final endLatitude = _radians(other.latitude);
+    final haversine = math.pow(math.sin(latitudeDelta / 2), 2) +
+        math.cos(startLatitude) *
+            math.cos(endLatitude) *
+            math.pow(math.sin(longitudeDelta / 2), 2);
+    return 2 *
+        earthRadiusMeters *
+        math.asin(math.sqrt(haversine.clamp(0.0, 1.0)));
+  }
+
   factory ClockLocation.fromMap(Map<String, dynamic> map) {
     return ClockLocation(
       latitude: (map['latitude'] as num).toDouble(),
@@ -34,6 +51,8 @@ class ClockLocation {
     );
   }
 }
+
+double _radians(double degrees) => degrees * math.pi / 180;
 
 class AttendanceRecord {
   const AttendanceRecord({
@@ -114,6 +133,21 @@ class AttendanceRecord {
             ),
       activeBreakId: data['active_break_id'] as String?,
       activeBreakStartedAt: _parseDate(data['active_break_started_at']),
+    );
+  }
+}
+
+class ClockOutResult {
+  const ClockOutResult({required this.distanceMeters});
+
+  final double distanceMeters;
+
+  factory ClockOutResult.fromMap(Map<String, dynamic> data) {
+    if (data['status'] != 'clocked_out') {
+      throw FormatException('Unknown clock-out result: ${data['status']}');
+    }
+    return ClockOutResult(
+      distanceMeters: (data['distance_meters'] as num).toDouble(),
     );
   }
 }
